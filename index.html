@@ -294,26 +294,178 @@
   }
 
   /* ---- Word Split & Dedupe layout ---- */
-  .wsplit-grid{
-    display:grid;
-    grid-template-columns: 1fr 1fr;
-    gap:18px;
-    padding:0 16px 16px;
+  .wsplit-hero{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding:22px 20px;
+    background:
+      radial-gradient(circle at 90% -10%, #ffe4d1 0%, transparent 55%),
+      linear-gradient(135deg, var(--moss) 0%, var(--moss-dark) 100%);
+    border-bottom:2px solid var(--ink);
+    border-radius:10px 10px 0 0;
+    color:#fff;
   }
+  .wsplit-hero-icon{
+    flex:0 0 auto;
+    width:52px;
+    height:52px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:26px;
+    background:rgba(255,255,255,.14);
+    border:2px solid rgba(255,255,255,.5);
+    border-radius:12px;
+  }
+  .wsplit-hero-title{
+    font-size:19px;
+    font-weight:700;
+    letter-spacing:-0.01em;
+  }
+  .wsplit-hero-sub{
+    font-family:var(--mono);
+    font-size:12px;
+    color:#e4efe9;
+    margin-top:4px;
+  }
+
   .wsplit-options{
-    padding:16px;
+    padding:14px 16px;
     display:flex;
     flex-wrap:wrap;
     gap:18px;
     align-items:center;
-    border-top:2px dashed var(--line);
+    border-bottom:2px dashed var(--line);
     font-family:var(--mono);
     font-size:12px;
   }
   .wsplit-options label{display:flex; align-items:center; gap:6px; cursor:pointer;}
 
+  .wsplit-run-row{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    padding:18px 16px;
+  }
+  button.btn.wsplit-run-btn{
+    font-size:14px;
+    padding:14px 32px;
+    border-radius:10px;
+    background:var(--clay);
+    border-color:#8a3d1e;
+    box-shadow:4px 4px 0 var(--line);
+  }
+  button.btn.wsplit-run-btn:hover{background:#9c451f;}
+
+  .wsplit-stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+    padding:0 16px 18px;
+  }
+  .stat-box{
+    border:2px solid var(--ink);
+    border-radius:10px;
+    padding:14px 12px;
+    text-align:center;
+    background:#fff;
+  }
+  .stat-box .stat-num{
+    font-family:var(--mono);
+    font-size:28px;
+    font-weight:700;
+    line-height:1;
+  }
+  .stat-box .stat-label{
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:#5c655f;
+    margin-top:6px;
+  }
+  .stat-box.total{border-color:var(--ink);}
+  .stat-box.unique{border-color:var(--moss-dark); background:#eaf2ee;}
+  .stat-box.unique .stat-num{color:var(--moss-dark);}
+  .stat-box.removed{border-color:#8a3d1e; background:#fbeee7;}
+  .stat-box.removed .stat-num{color:var(--clay);}
+
+  .wsplit-chip-panel{
+    margin:0 16px 16px;
+    border:2px solid var(--ink);
+    border-radius:10px;
+    background:#fbfaf6;
+  }
+  .wsplit-chip-panel .chip-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:9px 14px;
+    border-bottom:2px solid var(--ink);
+    background:#eef1ea;
+    border-radius:8px 8px 0 0;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--moss-dark);
+  }
+  .chip-wrap{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    padding:16px;
+    min-height:64px;
+  }
+  .chip-wrap:empty::before{
+    content:"Hasil kata unik akan tampil di sini sebagai tag \2014 klik \"Pecah & Hapus Duplikat\" untuk mulai.";
+    font-family:var(--mono);
+    font-size:12px;
+    color:#9aa39c;
+  }
+  .chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 12px;
+    border-radius:999px;
+    border:1.5px solid var(--moss-dark);
+    background:#fff;
+    color:var(--moss-dark);
+    font-family:var(--mono);
+    font-size:12.5px;
+    font-weight:600;
+    animation:chip-pop .25s ease both;
+  }
+  .chip:nth-child(3n+2){border-color:#8a3d1e; color:var(--clay);}
+  .chip:nth-child(3n){border-color:#8d7a3f; color:#8d7a3f;}
+  .chip .idx{
+    font-size:9px;
+    opacity:.55;
+    font-weight:400;
+  }
+  @keyframes chip-pop{
+    from{opacity:0; transform:scale(.85);}
+    to{opacity:1; transform:scale(1);}
+  }
+
+  .wsplit-raw-toggle{
+    margin:0 16px 16px;
+  }
+  .wsplit-raw-toggle summary{
+    cursor:pointer;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--moss-dark);
+    padding:6px 0;
+  }
+
   @media (max-width: 860px){
-    .wsplit-grid{grid-template-columns:1fr;}
+    .wsplit-stats{grid-template-columns:1fr;}
+    .wsplit-hero{flex-direction:column; text-align:center;}
   }
 
   /* ---- Convert Case layout ---- */
@@ -408,8 +560,8 @@
 
         <div class="sep-controls">
           <select id="sepDelim">
-            <option value="," selected>, (koma)</option>
-            <option value=", ">, (koma + spasi)</option>
+            <option value=",">, (koma)</option>
+            <option value=", " selected>, (koma + spasi)</option>
             <option value=";">; (titik koma)</option>
             <option value="|">| (pipe)</option>
             <option value="\t">Tab</option>
@@ -527,6 +679,14 @@
   <!-- ===================== TAB 4: SPLIT TO UNIQUE WORDS ===================== -->
   <section class="panel" id="wordsplit">
     <div class="card">
+      <div class="wsplit-hero">
+        <div class="wsplit-hero-icon">🔀</div>
+        <div>
+          <div class="wsplit-hero-title">Word Splitter & Deduplicator</div>
+          <div class="wsplit-hero-sub">Pecah teks panjang / daftar keyword jadi kumpulan entitas unik berdasarkan spasi — tanpa duplikat.</div>
+        </div>
+      </div>
+
       <label class="field-label">Teks asli (satu baris atau banyak baris)</label>
       <textarea id="wsplitInput" placeholder="Tempel daftar kata kunci atau teks di sini, satu per baris atau digabung, akan dipecah berdasarkan spasi…"></textarea>
 
@@ -536,24 +696,38 @@
         <label><input type="checkbox" id="wsplitLower"> Ubah hasil jadi huruf kecil semua</label>
       </div>
 
-      <div class="toolbar">
-        <button class="btn" id="wsplitClearIn">Bersihkan</button>
-        <button class="btn primary" id="wsplitRun" style="margin-left:auto;">⚙ Pecah &amp; Hapus Duplikat</button>
+      <div class="wsplit-run-row">
+        <button class="btn wsplit-run-btn" id="wsplitRun">⚙ Pecah &amp; Hapus Duplikat</button>
+        <button class="btn danger" id="wsplitClearIn">✕ Bersihkan</button>
       </div>
 
-      <div class="wsplit-grid">
-        <div>
-          <label class="field-label">Hasil: kumpulan entitas unik (pisah koma+spasi) <span class="stat-badge" id="wsplitStatUnique">0 kata</span></label>
-          <textarea id="wsplitOutput" placeholder="hasil kata unik akan muncul di sini, dipisah dengan &quot;, &quot;" readonly></textarea>
-          <div class="toolbar">
-            <button class="btn" id="wsplitCopyOut">Salin</button>
-          </div>
+      <div class="wsplit-stats">
+        <div class="stat-box total">
+          <div class="stat-num" id="wsplitStatTotalNum">0</div>
+          <div class="stat-label">Total kata</div>
         </div>
-        <div>
-          <label class="field-label">Statistik <span class="stat-badge" id="wsplitStatTotal">0 total kata</span></label>
-          <textarea id="wsplitStatsBox" placeholder="ringkasan akan muncul di sini" readonly></textarea>
+        <div class="stat-box unique">
+          <div class="stat-num" id="wsplitStatUniqueNum">0</div>
+          <div class="stat-label">Entitas unik</div>
+        </div>
+        <div class="stat-box removed">
+          <div class="stat-num" id="wsplitStatRemovedNum">0</div>
+          <div class="stat-label">Duplikat dihapus</div>
         </div>
       </div>
+
+      <div class="wsplit-chip-panel">
+        <div class="chip-head">
+          <span>Kumpulan entitas unik</span>
+          <button class="btn" id="wsplitCopyOut" style="padding:5px 12px; font-size:11px;">⧉ Salin semua</button>
+        </div>
+        <div class="chip-wrap" id="wsplitChips"></div>
+      </div>
+
+      <details class="wsplit-raw-toggle">
+        <summary>Lihat &amp; salin sebagai teks polos (plain text)</summary>
+        <textarea id="wsplitOutput" placeholder="hasil kata unik akan muncul di sini, dipisah dengan &quot;, &quot;" readonly style="min-height:100px;"></textarea>
+      </details>
     </div>
   </section>
 
@@ -789,6 +963,10 @@ document.getElementById('caseClear').addEventListener('click', ()=>{
 });
 
 // ---------- SPLIT TO UNIQUE WORDS ----------
+function escapeHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 document.getElementById('wsplitRun').addEventListener('click', ()=>{
   const raw = document.getElementById('wsplitInput').value;
   const ignoreCase = document.getElementById('wsplitIgnoreCase').checked;
@@ -818,28 +996,31 @@ document.getElementById('wsplitRun').addEventListener('click', ()=>{
   const uniqueCount = unique.length;
   const duplicateCount = totalCount - uniqueCount;
 
-  document.getElementById('wsplitStatUnique').textContent = uniqueCount + ' kata';
-  document.getElementById('wsplitStatTotal').textContent = totalCount + ' total kata';
+  document.getElementById('wsplitStatTotalNum').textContent = totalCount;
+  document.getElementById('wsplitStatUniqueNum').textContent = uniqueCount;
+  document.getElementById('wsplitStatRemovedNum').textContent = duplicateCount;
 
-  document.getElementById('wsplitStatsBox').value =
-`Total kata (sebelum dedup): ${totalCount}
-Kata unik (setelah dedup): ${uniqueCount}
-Kata duplikat yang dihapus: ${duplicateCount}
-Mode: ${ignoreCase ? 'Abaikan besar/kecil huruf' : 'Sadar besar/kecil huruf'}${sortAlpha ? '\nDiurutkan alfabet: Ya' : ''}${forceLower ? '\nDipaksa huruf kecil: Ya' : ''}`;
+  const chipContainer = document.getElementById('wsplitChips');
+  chipContainer.innerHTML = unique.map((w, i) =>
+    `<span class="chip"><span class="idx">${i+1}</span>${escapeHtml(w)}</span>`
+  ).join('');
 });
 
 document.getElementById('wsplitClearIn').addEventListener('click', ()=>{
   document.getElementById('wsplitInput').value = '';
   document.getElementById('wsplitOutput').value = '';
-  document.getElementById('wsplitStatsBox').value = '';
-  document.getElementById('wsplitStatUnique').textContent = '0 kata';
-  document.getElementById('wsplitStatTotal').textContent = '0 total kata';
+  document.getElementById('wsplitChips').innerHTML = '';
+  document.getElementById('wsplitStatTotalNum').textContent = '0';
+  document.getElementById('wsplitStatUniqueNum').textContent = '0';
+  document.getElementById('wsplitStatRemovedNum').textContent = '0';
 });
 
 document.getElementById('wsplitCopyOut').addEventListener('click', ()=>{
   const el = document.getElementById('wsplitOutput');
-  el.select();
-  navigator.clipboard.writeText(el.value).catch(()=>document.execCommand('copy'));
+  navigator.clipboard.writeText(el.value).catch(()=>{
+    el.select();
+    document.execCommand('copy');
+  });
 });
 </script>
 </body>
