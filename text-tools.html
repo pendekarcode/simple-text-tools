@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Text Tools — Separator &amp; Deduplikator</title>
+<style>
+  :root{
+    --ink:#1c2521;
+    --paper:#f6f4ee;
+    --panel:#ffffff;
+    --line:#dcd8cc;
+    --moss:#3f6659;
+    --moss-dark:#2c4a40;
+    --clay:#b5542a;
+    --mono: "IBM Plex Mono", "SFMono-Regular", Consolas, Menlo, monospace;
+    --sans: "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--paper);
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 28px 28px;
+    background-position: -1px -1px;
+    color:var(--ink);
+    font-family:var(--sans);
+    min-height:100vh;
+    padding: 32px 20px 60px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;}
+
+  header.top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    border-bottom:3px solid var(--ink);
+    padding-bottom:16px;
+    margin-bottom:22px;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  header.top .brand{
+    font-family:var(--mono);
+    font-size:13px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--moss-dark);
+  }
+  header.top h1{
+    margin:4px 0 0;
+    font-size:clamp(28px,4vw,42px);
+    line-height:1;
+    letter-spacing:-0.01em;
+  }
+  header.top .tagline{
+    font-family:var(--mono);
+    font-size:13px;
+    color:#5c655f;
+    max-width:320px;
+    text-align:right;
+  }
+
+  nav.tabs{
+    display:flex;
+    gap:0;
+    border:2px solid var(--ink);
+    border-radius:10px;
+    overflow:hidden;
+    width:fit-content;
+    margin-bottom:26px;
+    background:var(--panel);
+  }
+  nav.tabs button{
+    font-family:var(--mono);
+    font-size:13px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    padding:12px 22px;
+    border:none;
+    background:transparent;
+    color:var(--ink);
+    cursor:pointer;
+    position:relative;
+  }
+  nav.tabs button + button{border-left:2px solid var(--ink);}
+  nav.tabs button.active{background:var(--ink); color:var(--paper);}
+  nav.tabs button .n{color:var(--clay); margin-right:8px;}
+  nav.tabs button.active .n{color:#ffb38c;}
+
+  section.panel{display:none;}
+  section.panel.active{display:block;}
+
+  .card{
+    background:var(--panel);
+    border:2px solid var(--ink);
+    border-radius:12px;
+    box-shadow:6px 6px 0 var(--line);
+  }
+
+  label.field-label{
+    display:block;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--moss-dark);
+    padding:10px 16px;
+    border-bottom:2px solid var(--ink);
+    background:#eef1ea;
+    border-radius:10px 10px 0 0;
+  }
+
+  textarea{
+    width:100%;
+    min-height:220px;
+    border:none;
+    resize:vertical;
+    padding:16px;
+    font-family:var(--mono);
+    font-size:14px;
+    line-height:1.5;
+    background:transparent;
+    color:var(--ink);
+    outline:none;
+    border-radius:0 0 12px 12px;
+  }
+  textarea::placeholder{color:#9aa39c;}
+
+  .toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    padding:12px 16px;
+    border-top:2px solid var(--ink);
+    background:#f2f0e8;
+    border-radius:0 0 12px 12px;
+  }
+  button.btn{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    padding:8px 14px;
+    border:2px solid var(--ink);
+    border-radius:7px;
+    background:var(--panel);
+    color:var(--ink);
+    cursor:pointer;
+    transition:transform .08s ease;
+  }
+  button.btn:hover{transform:translateY(-1px);}
+  button.btn:active{transform:translateY(0);}
+  button.btn.primary{background:var(--moss); color:#fff; border-color:var(--moss-dark);}
+  button.btn.primary:hover{background:var(--moss-dark);}
+  button.btn.danger{background:var(--clay); color:#fff; border-color:#8a3d1e;}
+
+  /* ---- Separator layout ---- */
+  .sep-grid{
+    display:grid;
+    grid-template-columns: 1fr 150px 1fr;
+    gap:18px;
+    align-items:stretch;
+  }
+  .sep-controls{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    padding:16px 6px;
+  }
+  .sep-controls select{
+    width:100%;
+    font-family:var(--mono);
+    font-size:13px;
+    padding:8px;
+    border:2px solid var(--ink);
+    border-radius:7px;
+    background:var(--panel);
+  }
+  .sep-controls .arrow-btn{
+    width:100%;
+    padding:12px 6px;
+    font-size:16px;
+  }
+  .options-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:18px;
+    align-items:center;
+    padding:12px 16px;
+    border-top:2px dashed var(--line);
+    font-family:var(--mono);
+    font-size:12px;
+  }
+  .options-row label{display:flex; align-items:center; gap:6px; cursor:pointer;}
+
+  @media (max-width: 860px){
+    .sep-grid{grid-template-columns:1fr;}
+    .sep-controls{flex-direction:row; flex-wrap:wrap; justify-content:center;}
+    .sep-controls select{width:auto;}
+    .sep-controls .arrow-btn{width:auto;}
+  }
+
+  /* ---- Dedup layout ---- */
+  .dedup-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:18px;
+  }
+  .dedup-options{
+    margin-bottom:18px;
+    padding:16px;
+  }
+  .dedup-options h3{
+    margin:0 0 10px;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--moss-dark);
+  }
+  .toggle-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .toggle-row button.opt{
+    font-family:var(--mono);
+    font-size:12px;
+    padding:8px 14px;
+    border:2px solid var(--ink);
+    border-radius:7px;
+    background:var(--panel);
+    cursor:pointer;
+  }
+  .toggle-row button.opt.selected{
+    background:var(--ink);
+    color:var(--paper);
+  }
+  .checks{
+    display:flex;
+    flex-wrap:wrap;
+    gap:16px;
+    font-family:var(--mono);
+    font-size:13px;
+  }
+  .checks label{display:flex; gap:8px; align-items:center; cursor:pointer;}
+
+  .stat-badge{
+    display:inline-block;
+    font-family:var(--mono);
+    font-size:11px;
+    padding:3px 9px;
+    border-radius:20px;
+    border:1.5px solid var(--ink);
+    margin-left:10px;
+    background:#fff;
+  }
+
+  @media (max-width: 860px){
+    .dedup-grid{grid-template-columns:1fr;}
+  }
+
+  /* ---- Convert Case layout ---- */
+  .case-info{
+    display:flex;
+    flex-wrap:wrap;
+    gap:18px;
+    padding:10px 16px;
+    border-top:2px solid var(--ink);
+    background:#eef1ea;
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--moss-dark);
+  }
+  .case-btn-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(150px,1fr));
+    gap:10px;
+    padding:16px;
+  }
+  button.case-btn{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:4px;
+    padding:12px 14px;
+    border:2px solid var(--ink);
+    border-radius:9px;
+    background:var(--panel);
+    cursor:pointer;
+    text-align:left;
+    transition:transform .08s ease, background .1s ease;
+  }
+  button.case-btn:hover{transform:translateY(-2px); background:#eef1ea;}
+  button.case-btn:active{transform:translateY(0);}
+  button.case-btn .tag{
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.1em;
+    color:var(--clay);
+  }
+  button.case-btn .sample{
+    font-family:var(--mono);
+    font-size:14px;
+    font-weight:600;
+    color:var(--ink);
+  }
+  button.case-btn.active-case{
+    background:var(--moss);
+    border-color:var(--moss-dark);
+  }
+  button.case-btn.active-case .sample,
+  button.case-btn.active-case .tag{color:#fff;}
+
+  footer.foot{
+    margin-top:34px;
+    text-align:center;
+    font-family:var(--mono);
+    font-size:11px;
+    color:#8a9088;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <h1>Text Tools</h1>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-target="sep"><span class="n">01</span>Comma Separator</button>
+    <button class="tab-btn" data-target="dedup"><span class="n">02</span>Remove Duplicate Lines</button>
+    <button class="tab-btn" data-target="caseconv"><span class="n">03</span>Convert Case</button>
+  </nav>
+
+  <!-- ===================== TAB 1: COMMA SEPARATOR ===================== -->
+  <section class="panel active" id="sep">
+    <div class="card">
+      <div class="sep-grid">
+        <div>
+          <label class="field-label">Column data here...</label>
+          <textarea id="sepInput" placeholder="satu&#10;item&#10;per&#10;baris"></textarea>
+        </div>
+
+        <div class="sep-controls">
+          <select id="sepDelim">
+            <option value=",">, (koma)</option>
+            <option value=", " selected>, (koma + spasi)</option>
+            <option value=";">; (titik koma)</option>
+            <option value="|">| (pipe)</option>
+            <option value="\t">Tab</option>
+            <option value=" ">Spasi</option>
+            <option value="custom">Kustom…</option>
+          </select>
+          <input id="sepCustom" type="text" placeholder="pemisah kustom" style="display:none; width:100%; font-family:var(--mono); font-size:13px; padding:8px; border:2px solid var(--ink); border-radius:7px;">
+          <button class="btn primary arrow-btn" id="btnToRight">→ Gabungkan</button>
+          <button class="btn arrow-btn" id="btnToLeft">← Pisahkan</button>
+          <button class="btn danger arrow-btn" id="btnSepClear">✕ Bersihkan</button>
+        </div>
+
+        <div>
+          <label class="field-label">Delimited data here...</label>
+          <textarea id="sepOutput" placeholder="hasil,gabungan,akan,muncul,di sini"></textarea>
+        </div>
+      </div>
+
+      <div class="options-row">
+        <label><input type="checkbox" id="sepTrim" checked> Hapus spasi di awal/akhir tiap baris</label>
+        <label><input type="checkbox" id="sepSkipEmpty" checked> Lewati baris kosong</label>
+        <label><input type="checkbox" id="sepWrapQuote"> Bungkus tiap item dengan tanda kutip "</label>
+      </div>
+      <div class="toolbar">
+        <button class="btn" id="sepCopy">⧉ Salin hasil</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TAB 2: REMOVE DUPLICATE LINES ===================== -->
+  <section class="panel" id="dedup">
+    <div class="card">
+      <div class="dedup-options">
+        <h3>Opsi Huruf Besar/Kecil</h3>
+        <div class="toggle-row">
+          <button class="opt selected" data-group="case" data-val="ignore">Abaikan besar/kecil</button>
+          <button class="opt" data-group="case" data-val="sensitive">Sadar besar/kecil</button>
+        </div>
+
+        <h3>Tampilkan huruf besar/kecil pada hasil</h3>
+        <div class="toggle-row">
+          <button class="opt" data-group="show" data-val="lower">Huruf kecil</button>
+          <button class="opt" data-group="show" data-val="upper">Huruf besar</button>
+          <button class="opt selected" data-group="show" data-val="first">Kemunculan pertama</button>
+        </div>
+
+        <h3>Pengaturan lain</h3>
+        <div class="checks">
+          <label><input type="checkbox" id="optTrim"> Abaikan spasi di awal/akhir baris</label>
+          <label><input type="checkbox" id="optSort"> Urutkan hasil</label>
+          <label><input type="checkbox" id="optRemoveEmpty"> Hapus baris kosong</label>
+          <label><input type="checkbox" id="optShowRemoved" checked> Tampilkan baris yang dihapus</label>
+        </div>
+      </div>
+
+      <div class="dedup-grid" style="padding:0 16px 16px;">
+        <div>
+          <label class="field-label">Teks asli (dengan baris duplikat)</label>
+          <textarea id="dedupInput" placeholder="tempel teks kamu di sini, satu baris per entri"></textarea>
+          <div class="toolbar">
+            <button class="btn" id="dedupClearIn">Bersihkan</button>
+            <button class="btn" id="dedupSelectIn">Pilih semua</button>
+            <button class="btn primary" id="dedupRun" style="margin-left:auto;">⚙ HAPUS DUPLIKAT!</button>
+          </div>
+        </div>
+        <div>
+          <label class="field-label">Teks tanpa baris duplikat <span class="stat-badge" id="statUnique">0 baris</span></label>
+          <textarea id="dedupOutput" placeholder="hasil bersih akan muncul di sini" readonly></textarea>
+          <div class="toolbar">
+            <button class="btn" id="dedupClearOut">Bersihkan</button>
+            <button class="btn" id="dedupCopyOut">Salin</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding:0 16px 16px;">
+        <label class="field-label">Baris duplikat yang ditemukan &amp; dihapus <span class="stat-badge" id="statRemoved">0 baris</span></label>
+        <textarea id="dedupRemoved" placeholder="baris yang terhapus akan tercatat di sini" readonly></textarea>
+        <div class="toolbar">
+          <button class="btn" id="dedupCopyRemoved">Salin</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TAB 3: CONVERT CASE ===================== -->
+  <section class="panel" id="caseconv">
+    <div class="card">
+      <label class="field-label">Ketik atau tempel teks kamu</label>
+      <textarea id="caseInput" placeholder="Tulis teks di sini lalu pilih salah satu gaya huruf di bawah…"></textarea>
+
+      <div class="case-info">
+        <span>Jumlah karakter: <b id="charCount">0</b></span>
+        <span>Jumlah kata: <b id="wordCount">0</b></span>
+        <span>Jumlah baris: <b id="lineCount">0</b></span>
+      </div>
+
+      <div class="case-btn-grid">
+        <button class="case-btn" data-case="sentence"><span class="tag">Sc</span><span class="sample">Sentence case</span></button>
+        <button class="case-btn" data-case="lower"><span class="tag">lc</span><span class="sample">lower case</span></button>
+        <button class="case-btn" data-case="upper"><span class="tag">UC</span><span class="sample">UPPER CASE</span></button>
+        <button class="case-btn" data-case="capitalized"><span class="tag">CC</span><span class="sample">Capitalized Case</span></button>
+        <button class="case-btn" data-case="alternating"><span class="tag">aC</span><span class="sample">aLtErNaTiNg cAsE</span></button>
+        <button class="case-btn" data-case="title"><span class="tag">TC</span><span class="sample">Title Case</span></button>
+        <button class="case-btn" data-case="inverse"><span class="tag">iC</span><span class="sample">InVeRsE CaSe</span></button>
+      </div>
+
+      <div class="toolbar">
+        <button class="btn" id="caseCopy">⧉ Salin</button>
+        <button class="btn danger" id="caseClear">✕ Bersihkan</button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">Dijalankan sepenuhnya di sisi klien — tidak ada data yang dikirim ke server</footer>
+</div>
+
+<script>
+// ---------- TAB SWITCHING ----------
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.target).classList.add('active');
+  });
+});
+
+// ---------- COMMA SEPARATOR ----------
+const sepInput = document.getElementById('sepInput');
+const sepOutput = document.getElementById('sepOutput');
+const sepDelim = document.getElementById('sepDelim');
+const sepCustom = document.getElementById('sepCustom');
+
+sepDelim.addEventListener('change', ()=>{
+  sepCustom.style.display = sepDelim.value === 'custom' ? 'block' : 'none';
+});
+
+function getDelimiter(){
+  let d = sepDelim.value;
+  if(d === 'custom') return sepCustom.value || ',';
+  if(d === '\\t') return '\t';
+  return d;
+}
+
+document.getElementById('btnToRight').addEventListener('click', ()=>{
+  const trim = document.getElementById('sepTrim').checked;
+  const skipEmpty = document.getElementById('sepSkipEmpty').checked;
+  const wrap = document.getElementById('sepWrapQuote').checked;
+  const delim = getDelimiter();
+
+  let lines = sepInput.value.split(/\r?\n/);
+  if(trim) lines = lines.map(l=>l.trim());
+  if(skipEmpty) lines = lines.filter(l=>l.length>0);
+  if(wrap) lines = lines.map(l=>'"'+l.replace(/"/g,'""')+'"');
+
+  sepOutput.value = lines.join(delim);
+});
+
+document.getElementById('btnToLeft').addEventListener('click', ()=>{
+  const delim = getDelimiter();
+  const raw = sepOutput.value;
+  if(!raw){ sepInput.value=''; return; }
+  const parts = delim === '' ? [raw] : raw.split(delim);
+  sepInput.value = parts.map(p=>p.trim()).join('\n');
+});
+
+document.getElementById('sepClear') // guard, unused id fix below
+document.getElementById('btnSepClear').addEventListener('click', ()=>{
+  sepInput.value=''; sepOutput.value='';
+});
+
+document.getElementById('sepCopy').addEventListener('click', ()=>{
+  sepOutput.select();
+  navigator.clipboard.writeText(sepOutput.value).catch(()=>document.execCommand('copy'));
+});
+
+// ---------- REMOVE DUPLICATE LINES ----------
+let caseMode = 'ignore';   // ignore | sensitive
+let showMode = 'first';    // lower | upper | first
+
+document.querySelectorAll('.opt').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const group = btn.dataset.group;
+    document.querySelectorAll(`.opt[data-group="${group}"]`).forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected');
+    if(group === 'case') caseMode = btn.dataset.val;
+    else showMode = btn.dataset.val;
+  });
+});
+
+document.getElementById('dedupRun').addEventListener('click', ()=>{
+  const trimOpt = document.getElementById('optTrim').checked;
+  const sortOpt = document.getElementById('optSort').checked;
+  const removeEmptyOpt = document.getElementById('optRemoveEmpty').checked;
+  const showRemovedOpt = document.getElementById('optShowRemoved').checked;
+
+  let rawLines = document.getElementById('dedupInput').value.split(/\r?\n/);
+
+  const seen = new Map(); // key -> first occurrence original text
+  const uniqueOut = [];
+  const removedOut = [];
+
+  rawLines.forEach(originalLine=>{
+    let line = originalLine;
+    if(trimOpt) line = line.trim();
+
+    if(removeEmptyOpt && line.length===0) return;
+
+    let key = caseMode === 'ignore' ? line.toLowerCase() : line;
+
+    if(seen.has(key)){
+      if(showRemovedOpt) removedOut.push(originalLine);
+    } else {
+      seen.set(key, line);
+      let displayLine = line;
+      if(showMode === 'lower') displayLine = line.toLowerCase();
+      else if(showMode === 'upper') displayLine = line.toUpperCase();
+      // 'first' = keep as-is (first occurrence casing)
+      uniqueOut.push(displayLine);
+    }
+  });
+
+  let finalUnique = uniqueOut;
+  if(sortOpt) finalUnique = [...uniqueOut].sort((a,b)=>a.localeCompare(b));
+
+  document.getElementById('dedupOutput').value = finalUnique.join('\n');
+  document.getElementById('dedupRemoved').value = removedOut.join('\n');
+  document.getElementById('statUnique').textContent = finalUnique.length + ' baris';
+  document.getElementById('statRemoved').textContent = removedOut.length + ' baris';
+});
+
+document.getElementById('dedupClearIn').addEventListener('click', ()=>{
+  document.getElementById('dedupInput').value='';
+});
+document.getElementById('dedupSelectIn').addEventListener('click', ()=>{
+  document.getElementById('dedupInput').select();
+});
+document.getElementById('dedupClearOut').addEventListener('click', ()=>{
+  document.getElementById('dedupOutput').value='';
+});
+document.getElementById('dedupCopyOut').addEventListener('click', ()=>{
+  const el = document.getElementById('dedupOutput');
+  el.select();
+  navigator.clipboard.writeText(el.value).catch(()=>document.execCommand('copy'));
+});
+document.getElementById('dedupCopyRemoved').addEventListener('click', ()=>{
+  const el = document.getElementById('dedupRemoved');
+  el.select();
+  navigator.clipboard.writeText(el.value).catch(()=>document.execCommand('copy'));
+});
+
+// ---------- CONVERT CASE ----------
+const caseInput = document.getElementById('caseInput');
+const charCountEl = document.getElementById('charCount');
+const wordCountEl = document.getElementById('wordCount');
+const lineCountEl = document.getElementById('lineCount');
+
+function updateCaseStats(){
+  const val = caseInput.value;
+  charCountEl.textContent = val.length;
+  const words = val.trim().length ? val.trim().split(/\s+/) : [];
+  wordCountEl.textContent = words.length;
+  const lines = val.length ? val.split(/\r?\n/).length : 0;
+  lineCountEl.textContent = lines;
+}
+caseInput.addEventListener('input', updateCaseStats);
+updateCaseStats();
+
+function toSentenceCase(text){
+  let lower = text.toLowerCase();
+  let result = lower.replace(/(^\s*[a-z])|([.!?]\s+[a-z])/g, m => m.toUpperCase());
+  result = result.replace(/\bi\b/g, 'I');
+  return result;
+}
+function toCapitalizedCase(text){
+  return text.replace(/\S+/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+}
+function toAlternatingCase(text){
+  let i = 0;
+  return text.split('').map(ch=>{
+    if(/[a-zA-Z]/.test(ch)){
+      const out = i % 2 === 0 ? ch.toLowerCase() : ch.toUpperCase();
+      i++;
+      return out;
+    }
+    return ch;
+  }).join('');
+}
+const TITLE_MINOR_WORDS = new Set(['a','an','the','and','but','or','nor','for','so','yet','as','at','by','in','of','off','on','per','to','up','via','from','into','onto','with','vs']);
+function toTitleCase(text){
+  return text.split(' ').map((word, idx, arr)=>{
+    if(word.length === 0) return word;
+    const lower = word.toLowerCase();
+    const bare = lower.replace(/^[^a-z]+|[^a-z]+$/g,'');
+    const isEdge = idx === 0 || idx === arr.length - 1;
+    if(!isEdge && TITLE_MINOR_WORDS.has(bare)){
+      return lower;
+    }
+    const firstLetterMatch = word.match(/[a-zA-Z]/);
+    if(!firstLetterMatch) return word;
+    const pos = word.indexOf(firstLetterMatch[0]);
+    return word.slice(0,pos) + word.charAt(pos).toUpperCase() + word.slice(pos+1).toLowerCase();
+  }).join(' ');
+}
+function toInverseCase(text){
+  return text.split('').map(ch=>{
+    const upper = ch.toUpperCase();
+    const lower = ch.toLowerCase();
+    if(ch === upper && ch !== lower) return lower;
+    if(ch === lower && ch !== upper) return upper;
+    return ch;
+  }).join('');
+}
+
+document.querySelectorAll('.case-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.case-btn').forEach(b=>b.classList.remove('active-case'));
+    btn.classList.add('active-case');
+    const mode = btn.dataset.case;
+    let text = caseInput.value;
+    switch(mode){
+      case 'sentence': text = toSentenceCase(text); break;
+      case 'lower': text = text.toLowerCase(); break;
+      case 'upper': text = text.toUpperCase(); break;
+      case 'capitalized': text = toCapitalizedCase(text); break;
+      case 'alternating': text = toAlternatingCase(text); break;
+      case 'title': text = toTitleCase(text); break;
+      case 'inverse': text = toInverseCase(text); break;
+    }
+    caseInput.value = text;
+    updateCaseStats();
+  });
+});
+
+document.getElementById('caseCopy').addEventListener('click', ()=>{
+  caseInput.select();
+  navigator.clipboard.writeText(caseInput.value).catch(()=>document.execCommand('copy'));
+});
+document.getElementById('caseClear').addEventListener('click', ()=>{
+  caseInput.value = '';
+  updateCaseStats();
+  document.querySelectorAll('.case-btn').forEach(b=>b.classList.remove('active-case'));
+});
+</script>
+</body>
+</html>
