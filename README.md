@@ -1,30 +1,30 @@
 # Simple Text Tools
 
-**Alat teks online gratis** untuk menggabungkan data jadi format bertanda koma (comma separator), menghapus baris duplikat (remove duplicate lines), dan mengubah gaya huruf teks (convert case) — semuanya dalam **1 file HTML**, berjalan 100% di browser tanpa server, tanpa iklan, dan tanpa pelacakan data (no ads, no tracking, no spyware).
+A **free online text toolkit** for joining line-separated data into comma-separated format, removing duplicate lines, and converting text case — all in a **single HTML file**, running 100% in your browser with no server, no ads, and no tracking.
 
-Cocok untuk siapa saja yang butuh alat teks cepat: penulis konten, developer, data entry, pelajar, sampai admin media sosial — tanpa perlu instal aplikasi atau daftar akun.
+Perfect for anyone who needs quick text utilities: content writers, developers, data entry clerks, students, and social media admins — no app install or account required.
 
-🔗 **Live Demo:** _(isi link GitHub Pages / Netlify kamu di sini)_
+🔗 **Live Demo:** [pendekarcode.github.io/simple-text-tools](https://pendekarcode.github.io/simple-text-tools/)
 
 ---
 
-## ✨ Fitur
+## ✨ Features
 
 ### 1. Comma Separator
-Ubah data yang tersusun per baris (kolom) menjadi satu baris dipisah koma (atau pemisah lain), dan sebaliknya.
-- Pilihan pemisah: koma, koma+spasi, titik koma, pipe, tab, spasi, atau kustom
-- Opsi hapus spasi berlebih, lewati baris kosong, bungkus dengan tanda kutip
-- Konversi dua arah: gabungkan (encode) & pisahkan (decode)
+Turn line-by-line (column) data into a single comma-separated line, and back again.
+- Delimiter options: comma, comma+space, semicolon, pipe, tab, space, or custom
+- Options to trim whitespace, skip empty lines, wrap items in quotes
+- Two-way conversion: join (encode) & split (decode)
 
 ### 2. Remove Duplicate Lines
-Bersihkan teks dari baris yang terduplikasi secara instan.
-- Mode case sensitive / ignore case
-- Format hasil: lowercase, UPPERCASE, atau kemunculan pertama
-- Opsi urutkan hasil, hapus baris kosong, dan tampilkan daftar baris yang dihapus
+Instantly clean up text by removing duplicate lines.
+- Case-sensitive / ignore-case mode
+- Output casing: lowercase, UPPERCASE, or first occurrence
+- Options to sort results, remove empty lines, and show removed duplicates
 
 ### 3. Convert Case
-Ubah gaya penulisan teks ke berbagai format sekaligus.
-| Mode | Contoh |
+Transform text into multiple case styles.
+| Mode | Example |
 |---|---|
 | **Sentence case** | This is an example. |
 | **lower case** | this is an example. |
@@ -34,57 +34,57 @@ Ubah gaya penulisan teks ke berbagai format sekaligus.
 | **Title Case** | This Is an Example. |
 | **InVeRsE CaSe** | tHIS IS an EXAMPLE. |
 
-Dilengkapi penghitung karakter, kata, dan baris secara real-time.
+Includes a live character, word, and line counter.
 
 ---
 
-## 🚀 Cara Pakai
+## 🚀 Usage
 
-1. Download / clone repo ini
-2. Buka file `text-tools.html` langsung di browser (Chrome, Firefox, Edge, Safari)
-3. Pilih menu (tab) yang dibutuhkan, tempel teks kamu, dan gunakan tombol aksi
+1. Download / clone this repo
+2. Open `index.html` directly in your browser (Chrome, Firefox, Edge, Safari)
+3. Pick a tab, paste your text, and use the action buttons
 
-Tidak perlu instalasi, tidak perlu koneksi internet setelah file di-download, dan tidak ada data yang dikirim ke server mana pun — semua proses berjalan langsung di browser (client-side JavaScript).
+No installation needed, no internet connection required after downloading, and no data is ever sent to a server — everything runs client-side in JavaScript.
 
 ```bash
-git clone https://github.com/username/simple-text-tools.git
+git clone https://github.com/pendekarcode/simple-text-tools.git
 cd simple-text-tools
-# buka text-tools.html di browser
+# open index.html in your browser
 ```
 
-## 🌐 Deploy Online Gratis
+## 🌐 Free Deployment
 
-Repo ini adalah static site murni (HTML + CSS + JS), jadi bisa langsung online lewat:
+This repo is a pure static site (HTML + CSS + JS), so it can be hosted for free on:
 
-- **[GitHub Pages](https://pages.github.com/)** — aktifkan di *Settings → Pages*
-- **[Netlify Drop](https://app.netlify.com/drop)** — tinggal drag & drop file
-- **[Vercel](https://vercel.com/)** — hubungkan repo, auto-deploy
-- **[Cloudflare Pages](https://pages.cloudflare.com/)** — gratis & cepat
+- **[GitHub Pages](https://pages.github.com/)** — enable it under *Settings → Pages*
+- **[Netlify Drop](https://app.netlify.com/drop)** — just drag and drop the file
+- **[Vercel](https://vercel.com/)** — connect the repo for auto-deploy
+- **[Cloudflare Pages](https://pages.cloudflare.com/)** — free and fast
 
 ---
 
-## 🔒 Privasi
+## 🔒 Privacy
 
-- ✅ Tidak ada server backend
-- ✅ Tidak ada pengumpulan data pengguna
-- ✅ Tidak ada iklan (ads-free)
-- ✅ Tidak ada script pelacak pihak ketiga (no analytics/tracking)
-- ✅ Semua teks yang kamu masukkan tetap berada di perangkat kamu sendiri
+- ✅ No backend server
+- ✅ No user data collection
+- ✅ Ad-free
+- ✅ No third-party tracking scripts or analytics
+- ✅ All text you enter stays on your own device
 
-## 🛠️ Teknologi
+## 🛠️ Tech Stack
 
 - HTML5
-- CSS3 (custom design system, tanpa framework eksternal)
-- Vanilla JavaScript (tanpa dependency/library apa pun)
+- CSS3 (custom design system, no external framework)
+- Vanilla JavaScript (zero dependencies)
 
-## 📄 Lisensi
+## 📄 License
 
-Silakan gunakan, modifikasi, dan distribusikan bebas untuk keperluan pribadi maupun komersial.
+Free to use, modify, and distribute for personal or commercial purposes.
 
-## 🤝 Kontribusi
+## 🤝 Contributing
 
-Pull request dan saran fitur baru sangat diterima. Silakan buka *Issue* untuk melaporkan bug atau mengusulkan fitur tambahan (misalnya: word counter, slugify, JSON formatter, dll).
+Pull requests and feature suggestions are welcome. Feel free to open an *Issue* to report bugs or suggest new tools (e.g. word counter, slugify, JSON formatter, etc).
 
 ---
 
-**Kata kunci:** text tools online, comma separator online, remove duplicate lines, hapus baris duplikat, convert case online, uppercase to lowercase converter, title case converter, alat teks gratis, text tool tanpa iklan, client-side text utility, html text tools.
+**Keywords:** online text tools, comma separator online, remove duplicate lines, convert case online, uppercase to lowercase converter, title case converter, free text tool, ad-free text tool, client-side text utility, html text tools.
