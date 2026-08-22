@@ -293,6 +293,29 @@
     .dedup-grid{grid-template-columns:1fr;}
   }
 
+  /* ---- Word Split & Dedupe layout ---- */
+  .wsplit-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:18px;
+    padding:0 16px 16px;
+  }
+  .wsplit-options{
+    padding:16px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:18px;
+    align-items:center;
+    border-top:2px dashed var(--line);
+    font-family:var(--mono);
+    font-size:12px;
+  }
+  .wsplit-options label{display:flex; align-items:center; gap:6px; cursor:pointer;}
+
+  @media (max-width: 860px){
+    .wsplit-grid{grid-template-columns:1fr;}
+  }
+
   /* ---- Convert Case layout ---- */
   .case-info{
     display:flex;
@@ -361,14 +384,17 @@
 
   <header class="top">
     <div>
+      <div class="brand">◆ util / plaintext</div>
       <h1>Text Tools</h1>
     </div>
+    <div class="tagline">Dua alat teks sederhana — gabungkan kolom jadi baris berpisah koma, dan bersihkan baris duplikat. Semuanya berjalan di browser kamu.</div>
   </header>
 
   <nav class="tabs">
     <button class="tab-btn active" data-target="sep"><span class="n">01</span>Comma Separator</button>
     <button class="tab-btn" data-target="dedup"><span class="n">02</span>Remove Duplicate Lines</button>
     <button class="tab-btn" data-target="caseconv"><span class="n">03</span>Convert Case</button>
+    <button class="tab-btn" data-target="wordsplit"><span class="n">04</span>Split to Unique Words</button>
   </nav>
 
   <!-- ===================== TAB 1: COMMA SEPARATOR ===================== -->
@@ -383,7 +409,7 @@
         <div class="sep-controls">
           <select id="sepDelim">
             <option value="," selected>, (koma)</option>
-            <option value=", " selected>, (koma + spasi)</option>
+            <option value=", ">, (koma + spasi)</option>
             <option value=";">; (titik koma)</option>
             <option value="|">| (pipe)</option>
             <option value="\t">Tab</option>
@@ -494,6 +520,39 @@
       <div class="toolbar">
         <button class="btn" id="caseCopy">⧉ Salin</button>
         <button class="btn danger" id="caseClear">✕ Bersihkan</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TAB 4: SPLIT TO UNIQUE WORDS ===================== -->
+  <section class="panel" id="wordsplit">
+    <div class="card">
+      <label class="field-label">Teks asli (satu baris atau banyak baris)</label>
+      <textarea id="wsplitInput" placeholder="Tempel daftar kata kunci atau teks di sini, satu per baris atau digabung, akan dipecah berdasarkan spasi…"></textarea>
+
+      <div class="wsplit-options">
+        <label><input type="checkbox" id="wsplitIgnoreCase" checked> Abaikan besar/kecil huruf saat deteksi duplikat</label>
+        <label><input type="checkbox" id="wsplitSort"> Urutkan hasil secara alfabet</label>
+        <label><input type="checkbox" id="wsplitLower"> Ubah hasil jadi huruf kecil semua</label>
+      </div>
+
+      <div class="toolbar">
+        <button class="btn" id="wsplitClearIn">Bersihkan</button>
+        <button class="btn primary" id="wsplitRun" style="margin-left:auto;">⚙ Pecah &amp; Hapus Duplikat</button>
+      </div>
+
+      <div class="wsplit-grid">
+        <div>
+          <label class="field-label">Hasil: kumpulan entitas unik (pisah koma+spasi) <span class="stat-badge" id="wsplitStatUnique">0 kata</span></label>
+          <textarea id="wsplitOutput" placeholder="hasil kata unik akan muncul di sini, dipisah dengan &quot;, &quot;" readonly></textarea>
+          <div class="toolbar">
+            <button class="btn" id="wsplitCopyOut">Salin</button>
+          </div>
+        </div>
+        <div>
+          <label class="field-label">Statistik <span class="stat-badge" id="wsplitStatTotal">0 total kata</span></label>
+          <textarea id="wsplitStatsBox" placeholder="ringkasan akan muncul di sini" readonly></textarea>
+        </div>
       </div>
     </div>
   </section>
@@ -727,6 +786,60 @@ document.getElementById('caseClear').addEventListener('click', ()=>{
   caseInput.value = '';
   updateCaseStats();
   document.querySelectorAll('.case-btn').forEach(b=>b.classList.remove('active-case'));
+});
+
+// ---------- SPLIT TO UNIQUE WORDS ----------
+document.getElementById('wsplitRun').addEventListener('click', ()=>{
+  const raw = document.getElementById('wsplitInput').value;
+  const ignoreCase = document.getElementById('wsplitIgnoreCase').checked;
+  const sortAlpha = document.getElementById('wsplitSort').checked;
+  const forceLower = document.getElementById('wsplitLower').checked;
+
+  // Pecah berdasarkan spasi/whitespace apa pun (spasi, tab, baris baru)
+  const tokens = raw.split(/\s+/).map(t => t.trim()).filter(t => t.length > 0);
+
+  const seen = new Set();
+  let unique = [];
+  tokens.forEach(tok=>{
+    const key = ignoreCase ? tok.toLowerCase() : tok;
+    if(!seen.has(key)){
+      seen.add(key);
+      unique.push(tok);
+    }
+  });
+
+  if(forceLower) unique = unique.map(w => w.toLowerCase());
+  if(sortAlpha) unique = [...unique].sort((a,b)=>a.localeCompare(b));
+
+  const resultText = unique.join(', ');
+  document.getElementById('wsplitOutput').value = resultText;
+
+  const totalCount = tokens.length;
+  const uniqueCount = unique.length;
+  const duplicateCount = totalCount - uniqueCount;
+
+  document.getElementById('wsplitStatUnique').textContent = uniqueCount + ' kata';
+  document.getElementById('wsplitStatTotal').textContent = totalCount + ' total kata';
+
+  document.getElementById('wsplitStatsBox').value =
+`Total kata (sebelum dedup): ${totalCount}
+Kata unik (setelah dedup): ${uniqueCount}
+Kata duplikat yang dihapus: ${duplicateCount}
+Mode: ${ignoreCase ? 'Abaikan besar/kecil huruf' : 'Sadar besar/kecil huruf'}${sortAlpha ? '\nDiurutkan alfabet: Ya' : ''}${forceLower ? '\nDipaksa huruf kecil: Ya' : ''}`;
+});
+
+document.getElementById('wsplitClearIn').addEventListener('click', ()=>{
+  document.getElementById('wsplitInput').value = '';
+  document.getElementById('wsplitOutput').value = '';
+  document.getElementById('wsplitStatsBox').value = '';
+  document.getElementById('wsplitStatUnique').textContent = '0 kata';
+  document.getElementById('wsplitStatTotal').textContent = '0 total kata';
+});
+
+document.getElementById('wsplitCopyOut').addEventListener('click', ()=>{
+  const el = document.getElementById('wsplitOutput');
+  el.select();
+  navigator.clipboard.writeText(el.value).catch(()=>document.execCommand('copy'));
 });
 </script>
 </body>
